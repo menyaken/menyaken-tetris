@@ -1326,7 +1326,7 @@ function getAudioCtx() {
     sfxGain.connect(audioCtx.destination);
   }
   // iOSは明示的にresumeしないと永久に無音（タップ操作中の呼び出しなら許可される）
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (audioCtx.state !== 'running') audioCtx.resume(); // suspended/interrupted両方から復帰
   return audioCtx;
 }
 // 最初のタップで音を確実に起こす（iOS対策）
@@ -1335,7 +1335,7 @@ function getAudioCtx() {
 var silentUnlock = null;
 document.addEventListener('pointerdown', function() {
   var ac = getAudioCtx();
-  if (ac.state === 'suspended') ac.resume();
+  if (ac.state !== 'running') ac.resume(); // suspended/interrupted両方から復帰
   if (!silentUnlock) {
     silentUnlock = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
     silentUnlock.loop = true;
@@ -1424,7 +1424,7 @@ function scheduleBGMLoop(startTime) {
 function startBGM() {
   if (bgmPlaying) return;
   var ac = getAudioCtx();
-  if (ac.state === 'suspended') ac.resume();
+  if (ac.state !== 'running') ac.resume(); // suspended/interrupted両方から復帰
   bgmPlaying = true;
   scheduleBGMLoop(ac.currentTime + 0.1);
   var btn = document.getElementById('bgm-btn');
