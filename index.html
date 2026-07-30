@@ -1036,6 +1036,58 @@ body::before {
   opacity: 0.22; z-index: 0; pointer-events: none;
 }
 
+/* 縛りプレイ表示（初回クリア後のみ） */
+#pure-chip {
+  position: fixed; top: 6px; left: 8px; z-index: 120;
+  font-size: 11px; font-weight: 900;
+  padding: 3px 10px; border-radius: 999px;
+  pointer-events: none;
+}
+#pure-chip.pure-on {
+  background: rgba(255,213,79,0.95); color: #7a4a00;
+  box-shadow: 0 2px 0 rgba(154,106,0,0.6);
+}
+#pure-chip.pure-off {
+  background: rgba(120,110,115,0.55); color: #fff;
+}
+
+/* 真エンディング（店主の後ろ姿） */
+#card-layer.true-end {
+  background: #0a0507;
+}
+#card-layer.true-end #card-text {
+  color: #ffe9d2; letter-spacing: 0.06em;
+}
+#card-layer.true-end #card-text.big {
+  font-size: 34px; letter-spacing: 0.18em; color: #ffd54f;
+  text-shadow: 0 0 26px rgba(255,190,80,0.55);
+}
+#card-master {
+  max-width: min(88vw, 440px); max-height: 44vh;
+  border-radius: 10px; display: block;
+  filter: brightness(0.92) contrast(1.05);
+}
+/* 写真が無くても成立するよう、湯気の演出を背後に置く */
+#card-layer.true-end::before {
+  content: ""; position: absolute; left: 50%; bottom: 0;
+  width: 70vw; height: 60vh; transform: translateX(-50%);
+  background: radial-gradient(ellipse at bottom, rgba(255,196,120,0.20) 0%, transparent 70%);
+  animation: steamRise 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes steamRise {
+  from { opacity: 0.5; transform: translateX(-50%) translateY(10px) scale(1); }
+  to   { opacity: 0.9; transform: translateX(-50%) translateY(-10px) scale(1.06); }
+}
+
+/* 真エンディングのヒント（初回クリア後にタイトルへ出る） */
+#true-hint {
+  font-size: 11px; color: #8b4513;
+  background: #fff8ec; border: 2px dashed #c9a06a;
+  border-radius: 12px; padding: 6px 12px; margin-bottom: 10px;
+  max-width: 300px; text-align: center; line-height: 1.6;
+}
+
 /* QTE（親子丼波・発動コマンド入力） */
 #qte-layer {
   position: fixed; top: 7%; left: 0; right: 0;
@@ -1253,6 +1305,7 @@ body::before {
     <div class="tuto-row"><span class="tuto-key">HOLD</span><span>1回だけピースを保存</span></div>
     <div class="tuto-row"><span class="tuto-key">&#x2728;必殺</span><span>ゲージ満タンで発動</span></div>
   </div>
+  <div id="true-hint" class="gone"></div>
   <div class="overlay-stats" id="overlay-stats"></div>
   <div class="btn-col">
     <button id="story-btn" onclick="startStory()">&#x1F4D6; ストーリー 〜どんぶり山の約束〜</button>
@@ -1285,7 +1338,9 @@ body::before {
     </div>
   </div>
 </div>
+<div id="pure-chip" class="gone"></div>
 <div id="card-layer" class="gone">
+  <img id="card-master" class="gone" src="assets/story/img/master_back.jpg" alt="" onerror="this.style.display='none'">
   <img id="card-img" class="gone" alt="">
   <div id="card-text"></div>
   <div id="card-art" class="gone"></div>
@@ -2018,6 +2073,7 @@ function updateHissatsuGauge(delta) {
 
 function activateHissatsu() {
   if (!hissatsuReady || gameOver || paused || animating) return;
+  if (MODE === 'story') { pureUsedHissatsu = true; updatePureChip(); }
   hissatsuReady = false;
   hissatsuGauge = 0;
   updateHissatsuGauge(0);
@@ -2286,6 +2342,7 @@ function getNextPiece(idx) { return pieceQueue[idx] || null; }
 
 function holdCurrentPiece() {
   if (!canHold) return;
+  if (MODE === 'story') { pureUsedHold = true; updatePureChip(); }
   canHold = false;
   var saved = holdPiece;
   holdPiece = { id: currentPiece.id, matrix: PIECES[currentPiece.id].map(function(r) { return r.slice(); }) };
@@ -2709,6 +2766,7 @@ function resetCore() {
 function runGame() {
   spawnPiece();
   resizeCanvas();
+  updatePureChip();
   if (MODE === 'story') playStoryBgmForPhase(); else startBGM();
   showDogBubble('いってらっしゃい！\uD83C\uDF5C', '#ff6b9d');
   lastTime = performance.now();
@@ -2911,6 +2969,18 @@ var SC_EPILOGUE = [
   { img:'epi_kanpai.jpg', text:'カチーン', se:'clink' },
   { text:'完', big:true }
 ];
+// 真エンディング（必殺・ストック・替え玉を一度も使わず、最初から通した人だけ）
+var SC_TRUE_ENDING = [
+  { text:'', master:true },
+  { text:'……見てたよ', master:true },
+  { text:'一度も、楽をしなかったな', master:true },
+  { text:'必殺も、ストックも、替え玉も使わずに——', master:true },
+  { text:'毎日おなじことを、ちゃんと積み上げた', master:true },
+  { text:'それが一番むずかしいって、\nあんたはもう知ってる', master:true },
+  { text:'（振り返らないまま、丼を差し出す）', master:true },
+  { text:'——一杯、どうだ', master:true, big:true },
+  { text:'麺ゃけん\n新潟県長岡市浦536-3', small:true }
+];
 var SC_ENDROLL = [
   { img:'er1_young_father.jpg' },
   { img:'er2_happy.jpg' },
@@ -2950,6 +3020,16 @@ function renderCard() {
     art.classList.remove('gone');
   } else {
     art.classList.add('gone');
+  }
+  // 真エンディング：店主の後ろ姿（写真が無ければ湯気だけの暗転演出になる）
+  var master = document.getElementById('card-master');
+  var layer = document.getElementById('card-layer');
+  if (c.master) {
+    master.classList.remove('gone');
+    layer.classList.add('true-end');
+  } else {
+    master.classList.add('gone');
+    layer.classList.remove('true-end');
   }
   if (c.se === 'clink') sfxClink();
 }
@@ -3505,6 +3585,33 @@ function qteSuccess() {
 }
 
 // ===== QTEテストモード（URLに ?qte を付けて開くと、コマンド入力だけを試せる）=====
+// ===== 真エンディング：縛りプレイ判定 =====
+// 必殺・ストック(HOLD)・替え玉を一度も使わず、最初から通した人だけが到達できる
+var pureUsedHissatsu = false, pureUsedHold = false, pureUsedKaedama = false, pureFromStart = false;
+function isPureRun() {
+  return pureFromStart && !pureUsedHissatsu && !pureUsedHold && !pureUsedKaedama;
+}
+function resetPureRun(fromStart) {
+  pureUsedHissatsu = false; pureUsedHold = false; pureUsedKaedama = false;
+  pureFromStart = !!fromStart;
+  updatePureChip();
+}
+// 縛りが生きているかの表示（初回クリア後のみ。1周目のネタバレ防止）
+function updatePureChip() {
+  var chip = document.getElementById('pure-chip');
+  if (!chip) return;
+  var unlocked = localStorage.getItem('menyaKenStoryClear') === '1';
+  if (MODE !== 'story' || !unlocked || !gameStarted) { chip.classList.add('gone'); return; }
+  chip.classList.remove('gone');
+  if (isPureRun()) {
+    chip.textContent = '🏅 縛り継続中';
+    chip.className = 'pure-on';
+  } else {
+    chip.textContent = '縛り解除';
+    chip.className = 'pure-off';
+  }
+}
+
 var qteTestMode = false;
 function showQteTestMenu() {
   qteTestMode = true;
@@ -3659,7 +3766,16 @@ function finisherResolve() {
           showCards(SC_ENDROLL, function() {
             localStorage.removeItem(STORY_CP_KEY);
             localStorage.setItem('menyaKenStoryClear', '1');
-            showTitle('ストーリークリア!! どんぶり山で、また会おう 🏔️');
+            if (isPureRun()) {
+              // 真エンディング解放
+              localStorage.setItem('menyaKenTrueEnd', '1');
+              sfxClink();
+              showCards(SC_TRUE_ENDING, function() {
+                showTitle('真エンディング到達 🏅 一度も楽をしなかった人へ');
+              });
+            } else {
+              showTitle('ストーリークリア!! どんぶり山で、また会おう 🏔️');
+            }
           });
         });
       });
@@ -3773,6 +3889,7 @@ function kohakuEffect() {
 // --- モード入口・タイトル ---
 function startStory() {
   MODE = 'story';
+  resetPureRun(true); // 最初から通した走りだけが真エンディングの対象
   document.getElementById('overlay').classList.add('hidden');
   showCards(SC_OPENING, function() {
     beginStoryPhase('play1');
@@ -3780,6 +3897,7 @@ function startStory() {
 }
 function continueStory() {
   MODE = 'story';
+  resetPureRun(false); // 「続きから」は対象外
   document.getElementById('overlay').classList.add('hidden');
   beginStoryPhase(localStorage.getItem(STORY_CP_KEY) || 'play1');
 }
@@ -3812,6 +3930,7 @@ function showTitle(subMsg) {
   document.getElementById('story-bgimg').classList.add('gone');
   document.getElementById('title-art').classList.remove('gone');
   document.getElementById('overlay-dog').classList.add('gone');
+  document.getElementById('pure-chip').classList.add('gone');
   var ov = document.getElementById('overlay');
   ov.classList.remove('hidden');
   ov.classList.remove('tutorial-hidden');
@@ -3821,7 +3940,26 @@ function showTitle(subMsg) {
   refreshOverlayButtons('title');
   updateOverlayStats();
 }
+// タイトルの真エンディング案内（初回クリアで解禁、到達後は勲章表示）
+function refreshTrueHint() {
+  var el = document.getElementById('true-hint');
+  if (!el) return;
+  var cleared = localStorage.getItem('menyaKenStoryClear') === '1';
+  var trueEnd = localStorage.getItem('menyaKenTrueEnd') === '1';
+  if (trueEnd) {
+    el.textContent = '🏅 真エンディング到達済み — 一度も楽をしなかった証';
+    el.classList.remove('gone');
+  } else if (cleared) {
+    el.textContent = '？ 必殺も、ストックも、替え玉も使わずに\n最初からクリアすると……?';
+    el.style.whiteSpace = 'pre-line';
+    el.classList.remove('gone');
+  } else {
+    el.classList.add('gone');
+  }
+}
+
 function refreshOverlayButtons(state) {
+  refreshTrueHint();
   var storyBtn = document.getElementById('story-btn');
   var contBtn = document.getElementById('continue-btn');
   var mainBtn = document.getElementById('overlay-btn');
@@ -3844,6 +3982,7 @@ function refreshOverlayButtons(state) {
 }
 function overlayMain() {
   if (overlayMainMode === 'kaedama') {
+    pureUsedKaedama = true; // 替え玉＝縛り解除
     beginStoryPhase(localStorage.getItem(STORY_CP_KEY) || 'play1');
   } else {
     startGame();
