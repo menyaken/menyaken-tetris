@@ -1337,10 +1337,16 @@ document.addEventListener('pointerdown', function() {
   var ac = getAudioCtx();
   if (ac.state !== 'running') ac.resume(); // suspended/interrupted両方から復帰
   if (!silentUnlock) {
-    silentUnlock = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+    // 実体のある無音ファイルをループ再生し、iOSに「メディア再生中」と認識させる
+    // （これをやらないと消音スイッチONのとき効果音が全部消える）
+    silentUnlock = new Audio('assets/story/bgm/silence.mp3');
     silentUnlock.loop = true;
+    silentUnlock.volume = 0.01;
+    silentUnlock.setAttribute('playsinline', '');
     var p = silentUnlock.play();
     if (p && p.catch) p.catch(function() { silentUnlock = null; });
+  } else if (silentUnlock.paused) {
+    silentUnlock.play().catch(function() {});
   }
 }, true);
 
