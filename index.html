@@ -2971,14 +2971,14 @@ var SC_EPILOGUE = [
 ];
 // 真エンディング（必殺・ストック・替え玉を一度も使わず、最初から通した人だけ）
 var SC_TRUE_ENDING = [
-  { text:'', master:true },
-  { text:'……見てたよ', master:true },
-  { text:'一度も、楽をしなかったな', master:true },
-  { text:'必殺も、ストックも、替え玉も使わずに——', master:true },
-  { text:'毎日おなじことを、ちゃんと積み上げた', master:true },
-  { text:'それが一番むずかしいって、\nあんたはもう知ってる', master:true },
-  { text:'（振り返らないまま、丼を差し出す）', master:true },
-  { text:'——一杯、どうだ', master:true, big:true },
+  { text:'', master:'back' },
+  { text:'……見てたよ', master:'back' },
+  { text:'一度も、楽をしなかったな', master:'back' },
+  { text:'必殺も、ストックも、替え玉も使わずに——', master:'back' },
+  { text:'毎日おなじことを、ちゃんと積み上げた', master:'back' },
+  { text:'それが一番むずかしいって、\nあんたはもう知ってる', master:'back' },
+  { text:'（振り返らないまま、親指を立てた）', master:'thumb' },
+  { text:'——一杯、どうだ', master:'thumb', big:true },
   { text:'麺ゃけん\n新潟県長岡市浦536-3', small:true }
 ];
 var SC_ENDROLL = [
@@ -3025,6 +3025,8 @@ function renderCard() {
   var master = document.getElementById('card-master');
   var layer = document.getElementById('card-layer');
   if (c.master) {
+    master.src = ART + (c.master === 'thumb' ? 'master_thumbsup.jpg' : 'master_back.jpg');
+    master.style.display = '';
     master.classList.remove('gone');
     layer.classList.add('true-end');
   } else {
