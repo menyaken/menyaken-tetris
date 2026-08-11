@@ -472,7 +472,7 @@ body::before {
   padding: 20px;
 }
 #overlay.hidden { display: none; }
-#overlay { overflow-y: auto; justify-content: flex-start; padding-top: 28px; }
+#overlay { overflow-y: auto; justify-content: flex-start; padding-top: 28px; -webkit-overflow-scrolling: touch; }
 /* スマホ：タイトル画面を1画面に収める */
 @media (max-width: 480px), (max-height: 900px) {
   #overlay { padding-top: 12px; padding-bottom: 16px; }
@@ -1086,6 +1086,12 @@ body::before {
   background: #fff8ec; border: 2px dashed #c9a06a;
   border-radius: 12px; padding: 6px 12px; margin-bottom: 10px;
   max-width: 300px; text-align: center; line-height: 1.6;
+}
+/* 低い画面：タイトルを1画面に収める（下のボタンが画面外に落ちるのを防ぐ） */
+@media (max-height: 800px) {
+  #title-art { max-height: 130px; }
+  #true-hint { font-size: 10px; padding: 5px 10px; margin-bottom: 6px; }
+  #overlay-score { margin-bottom: 8px; }
 }
 
 /* QTE（親子丼波・発動コマンド入力） */
@@ -3953,6 +3959,10 @@ function refreshTrueHint() {
   if (!el) return;
   var cleared = localStorage.getItem('menyaKenStoryClear') === '1';
   var trueEnd = localStorage.getItem('menyaKenTrueEnd') === '1';
+  // クリア済みの人は操作をもう知っているので、説明ボックスをヒントに置き換える
+  // （タイトルが縦に伸びて下のボタンが画面外に落ちるのを防ぐ意味もある）
+  var tut = document.getElementById('tutorial');
+  if (tut) tut.classList.toggle('gone', cleared || trueEnd);
   if (trueEnd) {
     el.textContent = '🏅 真エンディング到達済み — 一度も楽をしなかった証';
     el.classList.remove('gone');
