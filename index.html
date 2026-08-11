@@ -2863,7 +2863,8 @@ function playStoryBgmForPhase() {
   var t = 'bgm_play';
   if (storyPhase === 'boss1') t = 'bgm_boss1';
   else if (storyPhase === 'boss2') t = 'bgm_boss2';
-  else if (storyPhase === 'finisher') t = 'bgm_finisher';
+  // とどめ：絶望フェーズは重厚な曲、「4列だ!」と分かった反撃フェーズはパンクロック
+  else if (storyPhase === 'finisher') t = finisherRevealed ? 'bgm_punk' : 'bgm_finisher';
   playStoryBgm(t, true);
 }
 
@@ -3406,7 +3407,10 @@ function storyOnLinesCleared(cleared, hadEgg) {
       if (finisherBlocked >= 6) {
         // 絶望の底で、父が割って入る →「一気に効くのは4列」解禁
         finisherRevealed = true;
-        showDialogue(SC_FINISHER, function() { updateBossUI(); });
+        showDialogue(SC_FINISHER, function() {
+          updateBossUI();
+          playStoryBgm('bgm_punk', true); // 反撃開始＝パンクロックに切り替え
+        });
       }
       return;
     }
@@ -3464,7 +3468,8 @@ function enterFinisher(resumed) {
   document.getElementById('boss-face').classList.remove('windup');
   document.getElementById('boss-warn').classList.add('gone');
   updateBossUI();
-  playStoryBgm('bgm_finisher', true);
+  // 続きから再開（解禁済み）ならパンク、通常進行の絶望フェーズは重厚な曲
+  playStoryBgm(finisherRevealed ? 'bgm_punk' : 'bgm_finisher', true);
 }
 // ===== QTE：親子丼波・発動コマンド入力 =====
 var qteActive = false;
@@ -3565,7 +3570,7 @@ function qteAbort() {
   storyPhase = 'finisher';
   updateBossUI();
   gameOver = false;
-  playStoryBgm('bgm_finisher', true);
+  playStoryBgm('bgm_punk', true); // 仕切り直しも反撃フェーズなのでパンクのまま
   startIdleLoop();
   lastTime = performance.now();
   lastActionTs = Date.now();
