@@ -318,9 +318,16 @@ body::before {
 }
 
 /* Dog speech bubble */
+/* ボス戦とけんの居場所。吹き出しの高さぶんだけ上に余白を取り、必殺ゲージと重ならないようにする */
+#side-bottom {
+  position: relative;
+  width: 100%;
+  margin-top: 32px;
+  display: flex; flex-direction: column; align-items: center;
+}
 #dog-bubble {
   position: absolute;
-  bottom: 72px; left: 50%;
+  bottom: 100%; margin-bottom: 6px; left: 50%;
   transform: translateX(-50%) scale(0);
   background: #fff;
   border: 3px solid #ff6b9d;
@@ -717,23 +724,25 @@ body::before {
 .gone { display: none !important; }
 
 /* Boss HP bar */
+/* サイドバー内の縦型バトル（ボスが上・けんが下で向かい合う） */
 #boss-bar {
   display: flex; flex-direction: column; gap: 3px;
-  width: auto; max-width: 320px; min-width: 250px;
-  padding: 4px 10px 5px; flex-shrink: 0;
+  width: 100%; max-width: none; min-width: 0;
+  padding: 4px 4px 5px; flex-shrink: 0;
   background: #2a1a22;
   border: 3px solid #8a2750;
   border-radius: 12px;
   box-shadow: 0 3px 0 #57152f;
-  margin: 2px auto;
-  align-self: center;
+  margin: 0;
+  align-self: stretch;
+  box-sizing: border-box;
 }
-.boss-hp-row { display: flex; align-items: center; gap: 8px; }
+.boss-hp-row { display: flex; flex-direction: column; align-items: stretch; gap: 2px; }
 #battle-stage {
   position: relative;
-  display: flex; align-items: flex-end; justify-content: center;
-  gap: 12px;
-  height: 44px; padding: 0 6px 2px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  height: auto; padding: 4px 2px;
   background: linear-gradient(to bottom,
     rgba(255,255,255,0.03) 0%,
     rgba(255,213,79,0.07) 65%,
@@ -776,12 +785,13 @@ body::before {
   100%     { transform: translateX(0); filter: none; }
 }
 #boss-name {
-  font-size: 10px; font-weight: 900; color: #ffd9e8;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex-shrink: 0; max-width: 52%;
+  font-size: 9px; font-weight: 900; color: #ffd9e8;
+  line-height: 1.2; text-align: center;
+  white-space: normal; overflow: visible; text-overflow: clip;
+  flex-shrink: 0; max-width: 100%; word-break: break-all;
 }
 .boss-hp-outer {
-  flex: 1; height: 8px;
+  flex: none; width: 100%; height: 8px; box-sizing: border-box;
   background: #57152f; border: 2px solid #ff6b9d; border-radius: 999px;
   overflow: hidden;
 }
@@ -1226,19 +1236,6 @@ body::before {
   </div>
 
   <!-- BATTLE STAGE (story mode) -->
-  <div id="boss-bar" class="gone">
-    <div class="boss-hp-row">
-      <div id="boss-name">???</div>
-      <div class="boss-hp-outer"><div id="boss-hp"></div></div>
-    </div>
-    <div id="battle-stage">
-      <div id="boss-face">&#x1F436;</div>
-      <div id="stage-vs">VS</div>
-      <div id="ken-face"><img src="assets/story/img/ken_fight.png" alt="けん"></div>
-      <div id="boss-warn" class="gone">&#x26A0;&#xFE0F;</div>
-    </div>
-  </div>
-
   <!-- PLAY AREA -->
   <div class="play-area">
     <canvas id="game-canvas"></canvas>
@@ -1258,13 +1255,28 @@ body::before {
         <div class="gauge-bar-outer"><div class="gauge-bar-inner" id="hissatsu-gauge"></div></div>
         <div class="gauge-paws" id="hissatsu-paws"></div>
       </div>
-      <div class="dog-side" id="dog-side">
+      <!-- ボス戦はここ（けんが居る場所）で行う。吹き出しの分だけ上に余白を確保してある -->
+      <div id="side-bottom">
         <div id="dog-bubble"></div>
-        <span class="sparkle">&#x2728;</span>
-        <span class="sparkle">&#x2728;</span>
-        <span class="sparkle">&#x2728;</span>
-        <span class="sparkle">&#x2728;</span>
-        <img id="side-dog" src="https://menyaken.com/wp-content/uploads/2023/09/%E3%81%91%E3%82%93%E3%83%AD%E3%82%B4%E3%83%95%E3%82%A1%E3%83%93%E3%82%B3%E3%83%B3.png" alt="けん">
+        <div id="boss-bar" class="gone">
+          <div class="boss-hp-row">
+            <div id="boss-name">???</div>
+            <div class="boss-hp-outer"><div id="boss-hp"></div></div>
+          </div>
+          <div id="battle-stage">
+            <div id="boss-face">&#x1F436;</div>
+            <div id="stage-vs">VS</div>
+            <div id="ken-face"><img src="assets/story/img/ken_fight.png" alt="けん"></div>
+            <div id="boss-warn" class="gone">&#x26A0;&#xFE0F;</div>
+          </div>
+        </div>
+        <div class="dog-side" id="dog-side">
+          <span class="sparkle">&#x2728;</span>
+          <span class="sparkle">&#x2728;</span>
+          <span class="sparkle">&#x2728;</span>
+          <span class="sparkle">&#x2728;</span>
+          <img id="side-dog" src="https://menyaken.com/wp-content/uploads/2023/09/%E3%81%91%E3%82%93%E3%83%AD%E3%82%B4%E3%83%95%E3%82%A1%E3%83%93%E3%82%B3%E3%83%B3.png" alt="けん">
+        </div>
       </div>
     </div>
   </div>
@@ -2870,7 +2882,7 @@ function playStoryBgmForPhase() {
   if (storyPhase === 'boss1') t = 'bgm_boss1';
   else if (storyPhase === 'boss2') t = 'bgm_boss2';
   // とどめ：絶望フェーズは重厚な曲、「4列だ!」と分かった反撃フェーズはパンクロック
-  else if (storyPhase === 'finisher') t = finisherRevealed ? 'bgm_punk' : 'bgm_finisher';
+  else if (storyPhase === 'finisher') t = (finisherRevealed && isPureRun()) ? 'bgm_punk' : 'bgm_finisher';
   playStoryBgm(t, true);
 }
 
@@ -3146,6 +3158,7 @@ function setupBoss(key) {
   faceEl.style.background = boss.faceBg;
   faceEl.classList.remove('windup','punch','hit');
   document.getElementById('boss-bar').classList.remove('gone');
+  document.getElementById('dog-side').classList.add('gone'); // 定位置のけんは戦闘用に交代
   document.getElementById('boss-warn').classList.add('gone');
   updateBossUI();
   resizeCanvas();
@@ -3154,6 +3167,7 @@ function setupBoss(key) {
 }
 function hideBossBar() {
   document.getElementById('boss-bar').classList.add('gone');
+  document.getElementById('dog-side').classList.remove('gone'); // ふわふわのけんに戻す
   document.getElementById('boss-face').classList.remove('windup','punch','hit');
   document.getElementById('boss-warn').classList.add('gone');
   resizeCanvas();
@@ -3197,16 +3211,21 @@ function throwProjectile(emoji, dir, onHit) {
   var toEl = document.getElementById(dir === 'ken' ? 'ken-face' : 'boss-face');
   var fr = fromEl.getBoundingClientRect();
   var tr = toEl.getBoundingClientRect();
+  // 縦並びのバトルなので、横だけでなく縦の移動にも対応させる
   var startX = fr.left - sr.left + fr.width / 2 - 17;
   var endX = tr.left - sr.left + tr.width / 2 - 17;
+  var startY = fr.top - sr.top + fr.height / 2;
+  var endY = tr.top - sr.top + tr.height / 2;
   var p = document.createElement('div');
   p.className = 'projectile';
   p.textContent = emoji;
   p.style.left = startX + 'px';
+  p.style.top = startY + 'px';
   stage.appendChild(p);
   void p.offsetWidth;
-  p.style.transition = 'left 0.35s ease-in, transform 0.35s ease-in';
+  p.style.transition = 'left 0.35s ease-in, top 0.35s ease-in, transform 0.35s ease-in';
   p.style.left = endX + 'px';
+  p.style.top = endY + 'px';
   p.style.transform = 'translateY(-50%) scale(1.35) rotate(' + (dir === 'ken' ? 40 : -40) + 'deg)';
   setTimeout(function() {
     p.remove();
@@ -3215,6 +3234,7 @@ function throwProjectile(emoji, dir, onHit) {
     burst.className = 'impact-burst';
     burst.textContent = '💥';
     burst.style.left = (endX - 2) + 'px';
+    burst.style.top = endY + 'px';
     stage.appendChild(burst);
     setTimeout(function() { burst.remove(); }, 400);
     if (onHit) onHit();
@@ -3229,6 +3249,7 @@ function floatAt(targetEl, text, extraClass) {
   div.className = 'dmg-float' + (extraClass ? ' ' + extraClass : '');
   div.style.left = (r.left - sr.left + r.width / 2 - 20) + 'px';
   div.style.right = 'auto';
+  div.style.top = Math.max(-4, r.top - sr.top - 18) + 'px'; // 相手の頭上に出す
   div.textContent = text;
   stage.appendChild(div);
   setTimeout(function() { div.remove(); }, 950);
@@ -3237,11 +3258,14 @@ function floatAt(targetEl, text, extraClass) {
 function dashAttack(attacker, target, emoji, onHit) {
   var a = attacker.getBoundingClientRect();
   var t = target.getBoundingClientRect();
-  var dx;
-  if (t.left > a.left) dx = (t.left - a.right) + a.width * 0.4;  // 右の相手へ
-  else dx = (t.right - a.left) - a.width * 0.4;                   // 左の相手へ
+  // 縦並び・横並びどちらでも成立するよう、中心どうしを結ぶ向きに突進する
+  var vx = (t.left + t.width / 2) - (a.left + a.width / 2);
+  var vy = (t.top + t.height / 2) - (a.top + a.height / 2);
+  var dist = Math.sqrt(vx * vx + vy * vy) || 1;
+  var stop = Math.max(0, dist - (a.height + t.height) * 0.34); // 相手の手前で止める
+  var dx = vx / dist * stop, dy = vy / dist * stop;
   attacker.style.transition = 'transform 0.22s cubic-bezier(0.35,0,0.7,1)';
-  attacker.style.transform = 'translateX(' + dx + 'px)';
+  attacker.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
   attacker.style.zIndex = 8;
   setTimeout(function() {
     // 接触！打撃エフェクトを相手の位置に出す
@@ -3251,6 +3275,7 @@ function dashAttack(attacker, target, emoji, onHit) {
     burst.className = 'impact-burst';
     burst.textContent = emoji;
     burst.style.left = (t.left - sr.left + t.width / 2 - 18) + 'px';
+    burst.style.top = (t.top - sr.top + t.height / 2) + 'px';
     stage.appendChild(burst);
     setTimeout(function() { burst.remove(); }, 400);
     if (onHit) onHit();
@@ -3415,7 +3440,7 @@ function storyOnLinesCleared(cleared, hadEgg) {
         finisherRevealed = true;
         showDialogue(SC_FINISHER, function() {
           updateBossUI();
-          playStoryBgm('bgm_punk', true); // 反撃開始＝パンクロックに切り替え
+          playStoryBgm(isPureRun() ? 'bgm_punk' : 'bgm_finisher', true); // 縛り継続中だけパンク版
         });
       }
       return;
@@ -3475,7 +3500,7 @@ function enterFinisher(resumed) {
   document.getElementById('boss-warn').classList.add('gone');
   updateBossUI();
   // 続きから再開（解禁済み）ならパンク、通常進行の絶望フェーズは重厚な曲
-  playStoryBgm(finisherRevealed ? 'bgm_punk' : 'bgm_finisher', true);
+  playStoryBgm((finisherRevealed && isPureRun()) ? 'bgm_punk' : 'bgm_finisher', true);
 }
 // ===== QTE：親子丼波・発動コマンド入力 =====
 var qteActive = false;
@@ -3576,7 +3601,7 @@ function qteAbort() {
   storyPhase = 'finisher';
   updateBossUI();
   gameOver = false;
-  playStoryBgm('bgm_punk', true); // 仕切り直しも反撃フェーズなのでパンクのまま
+  playStoryBgm(isPureRun() ? 'bgm_punk' : 'bgm_finisher', true); // 仕切り直しも同じ判定
   startIdleLoop();
   lastTime = performance.now();
   lastActionTs = Date.now();
