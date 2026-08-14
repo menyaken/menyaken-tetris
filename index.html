@@ -2882,7 +2882,7 @@ function playStoryBgmForPhase() {
   if (storyPhase === 'boss1') t = 'bgm_boss1';
   else if (storyPhase === 'boss2') t = 'bgm_boss2';
   // とどめ：絶望フェーズは重厚な曲、「4列だ!」と分かった反撃フェーズはパンクロック
-  else if (storyPhase === 'finisher') t = (finisherRevealed && isPureRun()) ? 'bgm_punk' : 'bgm_finisher';
+  else if (storyPhase === 'finisher') t = (finisherRevealed && isPureRun()) ? 'bgm_rock' : 'bgm_finisher';
   playStoryBgm(t, true);
 }
 
@@ -3440,7 +3440,7 @@ function storyOnLinesCleared(cleared, hadEgg) {
         finisherRevealed = true;
         showDialogue(SC_FINISHER, function() {
           updateBossUI();
-          playStoryBgm(isPureRun() ? 'bgm_punk' : 'bgm_finisher', true); // 縛り継続中だけパンク版
+          playStoryBgm(isPureRun() ? 'bgm_rock' : 'bgm_finisher', true); // 縛り継続中だけロック版
         });
       }
       return;
@@ -3500,7 +3500,7 @@ function enterFinisher(resumed) {
   document.getElementById('boss-warn').classList.add('gone');
   updateBossUI();
   // 続きから再開（解禁済み）ならパンク、通常進行の絶望フェーズは重厚な曲
-  playStoryBgm((finisherRevealed && isPureRun()) ? 'bgm_punk' : 'bgm_finisher', true);
+  playStoryBgm((finisherRevealed && isPureRun()) ? 'bgm_rock' : 'bgm_finisher', true);
 }
 // ===== QTE：親子丼波・発動コマンド入力 =====
 var qteActive = false;
@@ -3601,7 +3601,7 @@ function qteAbort() {
   storyPhase = 'finisher';
   updateBossUI();
   gameOver = false;
-  playStoryBgm(isPureRun() ? 'bgm_punk' : 'bgm_finisher', true); // 仕切り直しも同じ判定
+  playStoryBgm(isPureRun() ? 'bgm_rock' : 'bgm_finisher', true); // 仕切り直しも同じ判定
   startIdleLoop();
   lastTime = performance.now();
   lastActionTs = Date.now();
