@@ -2030,12 +2030,35 @@ function incrementGlobalClearCount() {
     } catch(e) { resolve(null); }
   });
 }
+// ===== 記録カウンター（プレイ数・ストーリー制覇・真エンディング）=====
+var stats = { play2: 0, story2: 0, trueend2: 0 };
+var playCounted = false;
+function bumpCounter(key) {
+  try { fetch(COUNTER_BASE + '/hit/' + COUNTER_NS + '/' + key)
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (d && typeof d.value === 'number') { stats[key] = d.value; updateOverlayStats(); } })
+    .catch(function(){}); } catch(e) {}
+}
+function fetchAllCounters() {
+  ['play2','story2','trueend2'].forEach(function(key) {
+    try { fetch(COUNTER_BASE + '/get/' + COUNTER_NS + '/' + key)
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if (d && typeof d.value === 'number') { stats[key] = d.value; updateOverlayStats(); } })
+      .catch(function(){}); } catch(e) {}
+  });
+}
 function updateOverlayStats() {
   var el = document.getElementById('overlay-stats');
   if (!el) return;
   var lines = [];
   if (myClearCount > 0) lines.push('あなたのクリア回数: <strong>' + myClearCount + '</strong>回');
-  if (globalClearCount > 0) lines.push('世界のクリア者: <strong>' + globalClearCount + '</strong>人');
+  if (stats.play2 > 0) lines.push('🍜 のべ <strong>' + stats.play2.toLocaleString() + '</strong> 回 遊ばれました');
+  var reach = [];
+  if (globalClearCount > 0) reach.push('🏆 1万点 <strong>' + globalClearCount + '</strong>人');
+  if (stats.story2 > 0) reach.push('📖 物語制覇 <strong>' + stats.story2 + '</strong>人');
+  if (reach.length) lines.push(reach.join(' ／ '));
+  if (stats.trueend2 > 0 && localStorage.getItem('menyaKenStoryClear') === '1')
+    lines.push('🏅 真エンディング到達 <strong>' + stats.trueend2 + '</strong>人');
   el.innerHTML = lines.join('<br>');
 }
 
@@ -2785,6 +2808,7 @@ function runGame() {
   spawnPiece();
   resizeCanvas();
   updatePureChip();
+  if (!playCounted) { playCounted = true; bumpCounter('play2'); } // 1回の来訪につき1回だけ数える
   if (MODE === 'story') playStoryBgmForPhase(); else startBGM();
   showDogBubble('いってらっしゃい！\uD83C\uDF5C', '#ff6b9d');
   lastTime = performance.now();
@@ -3803,9 +3827,11 @@ function finisherResolve() {
         showCards(SC_EPILOGUE, function() {
           showCards(SC_ENDROLL, function() {
             localStorage.removeItem(STORY_CP_KEY);
+            if (localStorage.getItem('menyaKenStoryClear') !== '1') bumpCounter('story2'); // 初制覇のみ計上
             localStorage.setItem('menyaKenStoryClear', '1');
             if (isPureRun()) {
               // 真エンディング解放
+              if (localStorage.getItem('menyaKenTrueEnd') !== '1') bumpCounter('trueend2');
               localStorage.setItem('menyaKenTrueEnd', '1');
               sfxClink();
               showCards(SC_TRUE_ENDING, function() {
@@ -4093,6 +4119,7 @@ resizeCanvas();
 // Pre-fetch global counter + update overlay stats
 updateOverlayStats();
 fetchGlobalClearCount();
+fetchAllCounters();
 </script>
 </body>
 </html>
