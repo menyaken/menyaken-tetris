@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>麺やけんテトリス 記録</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 20px 16px 40px;
+    background: linear-gradient(160deg, #fff3e6, #ffd9e8);
+    font-family: "Hiragino Maru Gothic ProN", "M PLUS Rounded 1c", sans-serif;
+    color: #5c3317; min-height: 100vh;
+  }
+  .wrap { max-width: 460px; margin: 0 auto; }
+  h1 { font-size: 20px; text-align: center; color: #c44678; margin: 6px 0 4px; }
+  .sub { text-align: center; font-size: 12px; color: #8b4513; margin-bottom: 18px; }
+  .card {
+    background: #fff; border: 3px solid #8b4513; border-radius: 16px;
+    box-shadow: 0 4px 0 #8b4513;
+    padding: 14px 16px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .label { font-size: 14px; font-weight: 700; line-height: 1.4; }
+  .note { display: block; font-size: 10px; color: #a8836a; font-weight: 400; margin-top: 2px; }
+  .num { font-size: 30px; font-weight: 900; color: #ff3b6e; white-space: nowrap; }
+  .num .unit { font-size: 14px; color: #8b4513; margin-left: 2px; }
+  .card.gold { border-color: #c9a06a; box-shadow: 0 4px 0 #c9a06a; background: #fffdf5; }
+  .card.gold .num { color: #d69a00; }
+  .foot { text-align: center; font-size: 11px; color: #8b4513; line-height: 1.8; margin-top: 18px; }
+  .btn {
+    display: block; max-width: 300px; margin: 16px auto 0; padding: 13px;
+    text-align: center; border-radius: 999px; text-decoration: none;
+    background: linear-gradient(135deg, #ff9ec4, #ff3b6e); color: #fff;
+    font-weight: 900; box-shadow: 0 4px 0 #8a2750;
+  }
+  .reload { background: #fff; color: #c44678; border: 3px solid #ff9ec4; box-shadow: 0 4px 0 #c44678; cursor: pointer; font-size: 15px; font-family: inherit; width: 100%; max-width: 300px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🍜 麺やけんテトリス 記録</h1>
+  <div class="sub" id="updated">読み込み中……</div>
+
+  <div class="card">
+    <div class="label">遊ばれた回数
+      <span class="note">ゲームを始めるたびに1つ増えます</span>
+    </div>
+    <div class="num"><span id="play2">–</span><span class="unit">回</span></div>
+  </div>
+
+  <div class="card">
+    <div class="label">物語を最後まで見た人
+      <span class="note">はじめてエンディングに届いた端末の数</span>
+    </div>
+    <div class="num"><span id="story2">–</span><span class="unit">人</span></div>
+  </div>
+
+  <div class="card gold">
+    <div class="label">🏅 真エンディング到達
+      <span class="note">必殺・ストック・替え玉なしで完走した人</span>
+    </div>
+    <div class="num"><span id="trueend2">–</span><span class="unit">人</span></div>
+  </div>
+
+  <div class="card">
+    <div class="label">エンドレスで1万点
+      <span class="note">到達するたびに1つ増えます</span>
+    </div>
+    <div class="num"><span id="clears">–</span><span class="unit">回</span></div>
+  </div>
+
+  <button class="btn reload" onclick="load()">🔄 最新の数字にする</button>
+  <a class="btn" href="./">ゲームをひらく</a>
+
+  <div class="foot">
+    端末ごとに数えているので「人数」は目安です。<br>
+    誰が遊んだかは記録していません。
+  </div>
+</div>
+
+<script>
+var BASE = 'https://abacus.jasoncameron.dev/get/menya-ken-tetris-v1/';
+function one(key) {
+  fetch(BASE + key)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var el = document.getElementById(key);
+      el.textContent = (d && typeof d.value === 'number') ? d.value.toLocaleString() : '0';
+    })
+    .catch(function(){ document.getElementById(key).textContent = '?'; });
+}
+function load() {
+  ['play2','story2','trueend2','clears'].forEach(one);
+  var n = new Date();
+  document.getElementById('updated').textContent =
+    n.getMonth()+1 + '月' + n.getDate() + '日 ' +
+    ('0'+n.getHours()).slice(-2) + ':' + ('0'+n.getMinutes()).slice(-2) + ' 現在';
+}
+load();
+</script>
+</body>
+</html>
