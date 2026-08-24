@@ -2031,7 +2031,7 @@ function incrementGlobalClearCount() {
   });
 }
 // ===== 記録カウンター（プレイ数・ストーリー制覇・真エンディング）=====
-var stats = { play2: 0, story2: 0, trueend2: 0 };
+var stats = { play2: 0, story2: 0, trueend2: 0, storyall: 0, trueall: 0, storystart: 0 };
 var playCounted = false;
 function bumpCounter(key) {
   try { fetch(COUNTER_BASE + '/hit/' + COUNTER_NS + '/' + key)
@@ -2040,7 +2040,7 @@ function bumpCounter(key) {
     .catch(function(){}); } catch(e) {}
 }
 function fetchAllCounters() {
-  ['play2','story2','trueend2'].forEach(function(key) {
+  ['play2','story2','trueend2','storyall','trueall','storystart'].forEach(function(key) {
     try { fetch(COUNTER_BASE + '/get/' + COUNTER_NS + '/' + key)
       .then(function(r){ return r.json(); })
       .then(function(d){ if (d && typeof d.value === 'number') { stats[key] = d.value; updateOverlayStats(); } })
@@ -3827,10 +3827,12 @@ function finisherResolve() {
         showCards(SC_EPILOGUE, function() {
           showCards(SC_ENDROLL, function() {
             localStorage.removeItem(STORY_CP_KEY);
-            if (localStorage.getItem('menyaKenStoryClear') !== '1') bumpCounter('story2'); // 初制覇のみ計上
+            bumpCounter('storyall'); // 制覇された回数（何度でも計上。過去にクリア済みの人も拾える）
+            if (localStorage.getItem('menyaKenStoryClear') !== '1') bumpCounter('story2'); // 初制覇の端末数
             localStorage.setItem('menyaKenStoryClear', '1');
             if (isPureRun()) {
               // 真エンディング解放
+              bumpCounter('trueall'); // 真エンド到達回数（何度でも）
               if (localStorage.getItem('menyaKenTrueEnd') !== '1') bumpCounter('trueend2');
               localStorage.setItem('menyaKenTrueEnd', '1');
               sfxClink();
@@ -3953,6 +3955,7 @@ function kohakuEffect() {
 // --- モード入口・タイトル ---
 function startStory() {
   MODE = 'story';
+  bumpCounter('storystart'); // 物語モードが始められた回数
   resetPureRun(true); // 最初から通した走りだけが真エンディングの対象
   document.getElementById('overlay').classList.add('hidden');
   showCards(SC_OPENING, function() {

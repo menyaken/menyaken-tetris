@@ -51,7 +51,21 @@
   </div>
 
   <div class="card">
-    <div class="label">物語を最後まで見た人
+    <div class="label">物語モードが始められた回数
+      <span class="note">「ストーリー 〜どんぶり山の約束〜」が押された数</span>
+    </div>
+    <div class="num"><span id="storystart">–</span><span class="unit">回</span></div>
+  </div>
+
+  <div class="card">
+    <div class="label">物語が制覇された回数
+      <span class="note">エンディングに届いた回数（同じ人の2周目も数えます）</span>
+    </div>
+    <div class="num"><span id="storyall">–</span><span class="unit">回</span></div>
+  </div>
+
+  <div class="card">
+    <div class="label">物語を制覇した人
       <span class="note">はじめてエンディングに届いた端末の数</span>
     </div>
     <div class="num"><span id="story2">–</span><span class="unit">人</span></div>
@@ -62,6 +76,13 @@
       <span class="note">必殺・ストック・替え玉なしで完走した人</span>
     </div>
     <div class="num"><span id="trueend2">–</span><span class="unit">人</span></div>
+  </div>
+
+  <div class="card gold">
+    <div class="label">🏅 真エンディング到達（回数）
+      <span class="note">2周目以降も数えます</span>
+    </div>
+    <div class="num"><span id="trueall">–</span><span class="unit">回</span></div>
   </div>
 
   <div class="card">
@@ -92,7 +113,7 @@ function one(key) {
     .catch(function(){ document.getElementById(key).textContent = '?'; });
 }
 function load() {
-  ['play2','story2','trueend2','clears'].forEach(one);
+  ['play2','storystart','storyall','story2','trueend2','trueall','clears'].forEach(one);
   var n = new Date();
   document.getElementById('updated').textContent =
     n.getMonth()+1 + '月' + n.getDate() + '日 ' +
