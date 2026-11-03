@@ -44,6 +44,13 @@
   <div class="sub" id="updated">読み込み中……</div>
 
   <div class="card">
+    <div class="label">ページが開かれた回数
+      <span class="note">ゲームのページが開かれた数(遊ばずに帰った人も入る)。2026-11-02から</span>
+    </div>
+    <div class="num"><span id="visit">–</span><span class="unit">回</span></div>
+  </div>
+
+  <div class="card">
     <div class="label">遊ばれた回数
       <span class="note">ゲームを始めるたびに1つ増えます</span>
     </div>
@@ -113,7 +120,7 @@ function one(key) {
     .catch(function(){ document.getElementById(key).textContent = '?'; });
 }
 function load() {
-  ['play2','storystart','storyall','story2','trueend2','trueall','clears'].forEach(one);
+  ['visit','play2','storystart','storyall','story2','trueend2','trueall','clears'].forEach(one);
   var n = new Date();
   document.getElementById('updated').textContent =
     n.getMonth()+1 + '月' + n.getDate() + '日 ' +

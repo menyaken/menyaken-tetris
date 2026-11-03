@@ -4123,6 +4123,8 @@ resizeCanvas();
 updateOverlayStats();
 fetchGlobalClearCount();
 fetchAllCounters();
+// ページを開いた回数(同じタブ内の再読み込みは数えない)2026-11-02追加
+try { if (!sessionStorage.getItem('menyaVisitCounted')) { sessionStorage.setItem('menyaVisitCounted','1'); bumpCounter('visit'); } } catch(e) { bumpCounter('visit'); }
 </script>
 </body>
 </html>
